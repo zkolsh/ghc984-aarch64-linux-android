@@ -7,7 +7,7 @@ jobs:
     env:
       TARGET: aarch64-linux-android
       API_LEVEL: 35
-      PREFIX: /opt/android-bridge
+      PREFIX: ${{ github.workspace }}/android-bridge
     steps:
       - name: Maximize Disk Space
         uses: jlumbroso/free-disk-space@main
@@ -15,26 +15,38 @@ jobs:
           tool-cache: true
           android: false
 
-      - name: Install Host Tools
+      - name: Checkout GHC
+        uses: actions/checkout@v4
+        with:
+          repository: 'ghc/ghc'
+          ref: 'ghc-9.8.4-release'
+          submodules: 'recursive'
+
+      - name: Setup Haskell
+        uses: haskell-actions/setup@v2
+        with:
+          ghc-version: '9.8.4'
+          cabal-version: '3.10.3.0'
+
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential automake autoconf libtool gperf python3 llvm-15
-          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_GHC_VERSION=9.8.4 BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.3.0 sh
-          echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
+          sudo apt-get install -y build-essential automake autoconf libtool gperf python3 llvm-15 clang
 
-      - name: Setup NDK Toolchain Path
+      - name: Setup NDK Path
         run: |
-          echo "TOOLCHAIN=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH" >> $GITHUB_PATH
+          echo "TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
+          echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
       - name: Build libiconv
         run: |
+          mkdir -p $PREFIX
           curl -LO https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
           tar -xzf libiconv-1.17.tar.gz
           cd libiconv-1.17
           ./configure --host=$TARGET --prefix=$PREFIX --disable-shared --enable-static \
             CC=$TARGET$API_LEVEL-clang
-          make -j2 && sudo make install
+          make -j$(nproc) && make install
 
       - name: Build ncurses
         run: |
@@ -44,14 +56,7 @@ jobs:
           ./configure --host=$TARGET --prefix=$PREFIX --with-shared=no --without-debug \
             --without-ada --without-cxx-binding --enable-widec \
             CC=$TARGET$API_LEVEL-clang
-          make -j2 && sudo make install
-
-      - name: Checkout GHC
-        uses: actions/checkout@v4
-        with:
-          repository: 'ghc/ghc'
-          ref: 'ghc-9.8.4-release'
-          submodules: 'recursive'
+          make -j$(nproc) && make install
 
       - name: Build GHC
         run: |
@@ -65,9 +70,13 @@ jobs:
             --with-curses-includes=$PREFIX/include \
             --with-curses-libraries=$PREFIX/lib \
             CONF_CC_OPTS_STAGE2="-I$PREFIX/include" \
-            CONF_GCC_LINKER_OPTS_STAGE2="-L$PREFIX/lib"
+            CONF_GCC_LINKER_OPTS_STAGE2="-L$PREFIX/lib" \
+            --with-clang=$TOOLCHAIN/bin/clang \
+            --with-ar=$TOOLCHAIN/bin/llvm-ar \
+            --with-nm=$TOOLCHAIN/bin/llvm-nm \
+            --with-ranlib=$TOOLCHAIN/bin/llvm-ranlib
 
-          hadrian/build -j2 --flavour=quick-cross binary-dist
+          hadrian/build -j$(nproc) --flavour=quick-cross binary-dist
 
       - name: Upload Finished GHC
         uses: actions/upload-artifact@v4
