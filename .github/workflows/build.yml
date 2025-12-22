@@ -1,0 +1,76 @@
+name: Build GHC 9.8.4 for Android
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: aarch64-linux-android
+      API_LEVEL: 35
+      PREFIX: /opt/android-bridge
+    steps:
+      - name: Maximize Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: false
+
+      - name: Install Host Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential automake autoconf libtool gperf python3 llvm-15
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 BOOTSTRAP_HASKELL_GHC_VERSION=9.8.4 BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.3.0 sh
+          echo "$HOME/.ghcup/bin" >> $GITHUB_PATH
+
+      - name: Setup NDK Toolchain Path
+        run: |
+          echo "TOOLCHAIN=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
+          echo "PATH=$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH" >> $GITHUB_PATH
+
+      - name: Build libiconv
+        run: |
+          curl -LO https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
+          tar -xzf libiconv-1.17.tar.gz
+          cd libiconv-1.17
+          ./configure --host=$TARGET --prefix=$PREFIX --disable-shared --enable-static \
+            CC=$TARGET$API_LEVEL-clang
+          make -j2 && sudo make install
+
+      - name: Build ncurses
+        run: |
+          curl -LO https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
+          tar -xzf ncurses-6.4.tar.gz
+          cd ncurses-6.4
+          ./configure --host=$TARGET --prefix=$PREFIX --with-shared=no --without-debug \
+            --without-ada --without-cxx-binding --enable-widec \
+            CC=$TARGET$API_LEVEL-clang
+          make -j2 && sudo make install
+
+      - name: Checkout GHC
+        uses: actions/checkout@v4
+        with:
+          repository: 'ghc/ghc'
+          ref: 'ghc-9.8.4-release'
+          submodules: 'recursive'
+
+      - name: Build GHC
+        run: |
+          ./boot
+          ./configure \
+            --target=$TARGET \
+            --with-intree-gmp \
+            --with-system-libffi=no \
+            --with-iconv-includes=$PREFIX/include \
+            --with-iconv-libraries=$PREFIX/lib \
+            --with-curses-includes=$PREFIX/include \
+            --with-curses-libraries=$PREFIX/lib \
+            CONF_CC_OPTS_STAGE2="-I$PREFIX/include" \
+            CONF_GCC_LINKER_OPTS_STAGE2="-L$PREFIX/lib"
+
+          hadrian/build -j2 --flavour=quick-cross binary-dist
+
+      - name: Upload Finished GHC
+        uses: actions/upload-artifact@v4
+        with:
+          name: ghc-9.8.4-android-aarch64
+          path: _build/bindist/*.tar.xz
