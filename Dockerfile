@@ -64,9 +64,6 @@ ENV AR=aarch64-linux-android-ar
 ENV RANLIB=aarch64-linux-android-ranlib
 ENV STRIP=aarch64-linux-android-strip
 
-RUN curl -fsSL https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
-ENV PATH=/root/.ghcup/bin:$PATH
-
 RUN cabal update
 
 RUN cabal install \
