@@ -36,7 +36,6 @@ export ANDROID_TOOLCHAIN=/opt/android-toolchain
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
-  --docs=no-sphinx,no-haddock,no-man \
   binary-dist
 
 echo
