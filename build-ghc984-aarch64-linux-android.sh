@@ -6,11 +6,11 @@ TARGET=aarch64-linux-android
 ANDROID_API=21
 
 export PATH=/opt/android-toolchain/bin:${PATH}
-export CC=aarch64-linux-android-clang
-export CXX=aarch64-linux-android-clang++
-export LD=aarch64-linux-android-ld
-export AR=aarch64-linux-android-ar
-export RANLIB=aarch64-linux-android-ranlib
+export CC=aarch64-linux-android21-clang
+export CXX=aarch64-linux-android21-clang++
+export LD=$CC
+export AR=llvm-ar
+export RANLIB=llvm-ranlib
 export STRIP=aarch64-linux-android-strip
 
 export LC_ALL=C.UTF-8
