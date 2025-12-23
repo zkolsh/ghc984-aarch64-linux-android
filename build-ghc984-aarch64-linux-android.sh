@@ -30,7 +30,7 @@ git submodule update --init --recursive
 ./boot
 ./configure \
     --target=$TARGET \
-    --with-intree-gmp \
+    --with-ghc-bignum-backend=native \
     --with-system-libffi \
     --enable-unregisterised \
     CC="$CC" \
@@ -49,8 +49,9 @@ hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
   "*.capstone.configure=--host=$TARGET" \
-  "*.gmp.configure=--host=$TARGET" \
   "stage1.*.ghc.link.opts=-optl-static" \
+  "stage1.apache-httpd.-terminfo" \
+  "stage1.hsc2hs.-terminfo" \
   binary-dist
 
 echo
