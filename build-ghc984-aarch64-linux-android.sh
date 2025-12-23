@@ -1,57 +1,62 @@
 #!/usr/bin/env bash
-set -eux
+set -euo pipefail
 
-PREFIX=/opt/android-bridge
+GHC_VERSION=9.8.4
 TARGET=aarch64-linux-android
-API=21
-CC=${TARGET}${API}-clang
+ANDROID_API=21
 
-curl -LO https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-tar -xzf libiconv-1.17.tar.gz
-cd libiconv-1.17
-./configure --host=$TARGET --prefix=$PREFIX --disable-shared --enable-static CC=$CC
-make -j$(nproc)
-make install
-cd ..
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
 
-curl -LO https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
-tar -xzf ncurses-6.4.tar.gz
-cd ncurses-6.4
-./configure \
-  --host=$TARGET \
-  --prefix=$PREFIX \
-  --with-shared=no \
-  --without-debug \
-  --without-ada \
-  --without-cxx-binding \
-  --enable-widec \
-  --disable-stripping \
-  --without-progs \
-  CC=$CC
-make -j$(nproc)
-make install
-cd ..
+if [ ! -d ghc ]; then
+  git clone --branch ghc-${GHC_VERSION}-release \
+    --depth 1 https://gitlab.haskell.org/ghc/ghc.git
+fi
 
-git clone --recursive -b ghc-9.8.4-release https://github.com/ghc/ghc.git ghc
 cd ghc
+git submodule update --init --recursive
+
+cat > hadrian/settings.cabal <<EOF
+build-tool-depends:
+  alex:alex == 3.2.7.1,
+  happy:happy == 1.20.1.1
+EOF
+
+cat > mk/build.mk <<EOF
+BuildFlavour = quick-cross
+
+SRC_HC_OPTS += -O0
+GhcLibHcOpts += -O0
+
+Stage1Only = YES
+HADRIAN_ARGS += --docs=no-sphinx
+EOF
+
+export ANDROID_NDK_ROOT=/opt/android-ndk
+export ANDROID_TOOLCHAIN=/opt/android-toolchain
+
+export CC=aarch64-linux-android-clang
+export CXX=aarch64-linux-android-clang++
+export LD=aarch64-linux-android-ld
+export AR=aarch64-linux-android-ar
+export RANLIB=aarch64-linux-android-ranlib
+export STRIP=aarch64-linux-android-strip
 
 ./boot
-export CC=aarch64-linux-android35-clang
-export CXX=aarch64-linux-android35-clang++
-export AS=aarch64-linux-android35-clang
-export LD=ld.lld
-export AR=llvm-ar
-export NM=llvm-nm
-export RANLIB=llvm-ranlib
 ./configure \
-  --target=aarch64-linux-android \
-  --with-intree-gmp \
-  --with-system-libffi=no \
-  --with-iconv-includes=/opt/android-bridge/include \
-  --with-iconv-libraries=/opt/android-bridge/lib \
-  --with-curses-includes=/opt/android-bridge/include \
-  --with-curses-libraries=/opt/android-bridge/lib \
-  CONF_CC_OPTS_STAGE2="-I/opt/android-bridge/include" \
-  CONF_GCC_LINKER_OPTS_STAGE2="-L/opt/android-bridge/lib"
+  --target=${TARGET} \
+  --with-gmp \
+  --disable-numa \
+  --enable-unregisterised \
+  --enable-shared \
+  --enable-dynamic \
+  --with-iconv=no
 
-hadrian/build -j$(nproc) --flavour=quick-cross binary-dist
+hadrian/build \
+  --flavour=quick-cross \
+  --build-root=_build \
+  binary-dist
+
+echo
+echo "Bindist located at:"
+ls -lh _build/bindist

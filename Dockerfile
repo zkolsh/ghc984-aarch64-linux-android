@@ -1,43 +1,74 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ANDROID_API=35
-ENV TARGET=aarch64-linux-android
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV ANDROID_NDK_ROOT=/opt/android-ndk
+ENV ANDROID_API=21
+ENV NDK_VERSION=29.0.14206865
 
 RUN apt-get update && apt-get install -y \
-    build-essential autoconf automake libtool \
-    curl git python3 gperf \
-    llvm-15 clang \
-    xz-utils ca-certificates \
+    build-essential \
+    curl \
+    git \
+    python3 \
+    python3-pip \
+    libgmp-dev \
+    libncurses-dev \
+    libtinfo-dev \
+    libffi-dev \
+    libnuma-dev \
+    zlib1g-dev \
+    ca-certificates \
+    xz-utils \
+    unzip \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    ghc \
     cabal-install \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /ndk && \
-    curl -L https://dl.google.com/android/repository/android-ndk-r26d-linux.zip \
-    -o /ndk/ndk.zip && \
-    apt-get update && apt-get install -y unzip && \
-    unzip /ndk/ndk.zip -d /ndk && \
-    mv /ndk/android-ndk-r26d /android-ndk && \
-    rm -rf /ndk
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    curl -L https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
+      -o /tmp/cmdline-tools.zip && \
+    unzip /tmp/cmdline-tools.zip -d ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    mv ${ANDROID_SDK_ROOT}/cmdline-tools/cmdline-tools \
+       ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
+    rm /tmp/cmdline-tools.zip
 
-ENV ANDROID_NDK_HOME=/android-ndk
-ENV PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+ENV PATH=${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/platform-tools:${PATH}
+
+RUN yes | sdkmanager --licenses && \
+    sdkmanager \
+      "platform-tools" \
+      "platforms;android-${ANDROID_API}" \
+      "ndk;${NDK_VERSION}"
+
+RUN ln -s ${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION} ${ANDROID_NDK_ROOT}
+
+RUN ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py \
+      --arch arm64 \
+      --api ${ANDROID_API} \
+      --install-dir /opt/android-toolchain
+
+ENV PATH=/opt/android-toolchain/bin:${PATH}
+ENV CC=aarch64-linux-android-clang
+ENV CXX=aarch64-linux-android-clang++
+ENV LD=aarch64-linux-android-ld
+ENV AR=aarch64-linux-android-ar
+ENV RANLIB=aarch64-linux-android-ranlib
+ENV STRIP=aarch64-linux-android-strip
 
 RUN curl -fsSL https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
 ENV PATH=/root/.ghcup/bin:$PATH
 
-RUN mkdir -p /opt/ghc-src && \
-    curl -L https://downloads.haskell.org/ghc/9.8.4/ghc-9.8.4-x86_64-deb11-linux.tar.xz \
-    | tar -xJ -C /opt/ghc-src --strip-components=1 && \
-    cd /opt/ghc-src && \
-    ./configure --prefix=/opt/ghc && \
-    make install
+RUN cabal update
 
-ENV PATH=/opt/ghc/bin:$PATH
+RUN cabal install \
+      alex-3.2.7.1 \
+      happy-1.20.1.1 \
+      --installdir=/usr/local/bin \
+      --overwrite-policy=always
 
-RUN cabal update && \
-    cabal install happy-1.20.1.1 --installdir=/usr/local/bin --overwrite-policy=always
-
-RUN cabal install alex-3.2.7.1 --installdir=/usr/local/bin --overwrite-policy=always
-
-WORKDIR /build
+WORKDIR /workspace
