@@ -70,7 +70,7 @@ RUN curl -L https://downloads.haskell.org/~ghc/${BOOTSTRAP_GHC}/ghc-${BOOTSTRAP_
     -o /tmp/ghc.tar.xz && \
     mkdir -p /tmp/ghc && \
     tar -xf /tmp/ghc.tar.xz -C /tmp/ghc && \
-    cd /tmp/ghc/ghc-${BOOTSTRAP_GHC} && \
+    cd /tmp/ghc/ghc-${BOOTSTRAP_GHC}-x86_64-deb10-linux && \
     ./configure --prefix=${GHC_PREFIX} && \
     make install && \
     rm -rf /tmp/ghc /tmp/ghc.tar.xz
