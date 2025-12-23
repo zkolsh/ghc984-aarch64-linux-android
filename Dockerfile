@@ -23,6 +23,9 @@ RUN mkdir /ndk && \
 ENV ANDROID_NDK_HOME=/android-ndk
 ENV PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
+RUN curl -fsSL https://get-ghcup.haskell.org | BOOTSTRAP_HASKELL_NONINTERACTIVE=1 sh
+ENV PATH=/root/.ghcup/bin:$PATH
+
 RUN mkdir -p /opt/ghc-src && \
     curl -L https://downloads.haskell.org/ghc/9.8.4/ghc-9.8.4-x86_64-deb11-linux.tar.xz \
     | tar -xJ -C /opt/ghc-src --strip-components=1 && \
@@ -33,8 +36,8 @@ RUN mkdir -p /opt/ghc-src && \
 ENV PATH=/opt/ghc/bin:$PATH
 
 RUN cabal update && \
-    cabal install happy alex \
-      --install-method=copy \
-      --installdir=/usr/local/bin
+    cabal install happy-1.20.1 --installdir=/usr/local/bin --overwrite-policy=always
+
+RUN cabal install alex-3.2.7 --installdir=/usr/local/bin --overwrite-policy=always
 
 WORKDIR /build
