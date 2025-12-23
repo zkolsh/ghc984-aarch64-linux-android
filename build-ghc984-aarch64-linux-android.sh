@@ -2,7 +2,7 @@
 set -euo pipefail
 
 GHC_VERSION=9.8.4
-TARGET=aarch64-linux-android
+TARGET=aarch64-unknown-linux-android
 ANDROID_API=21
 
 export PATH=/opt/android-toolchain/bin:${PATH}
@@ -30,14 +30,19 @@ export ANDROID_TOOLCHAIN=/opt/android-toolchain
 ./boot
 ./configure \
   --target=${TARGET} \
-  --disable-numa \
-  --enable-unregisterised
+  --with-intree-gmp \
+  --with-system-libffi \
+  --enable-unregisterised \
+  --with-clang=$CC \
+  --with-ld=$LD \
+  --with-nm=$(which llvm-nm) \
+  --with-ar=$AR \
+  --with-ranlib=$RANLIB \
+  --with-strip=$STRIP
 
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
-  --target=aarch64-linux-android \
-  --cross-compile \
   binary-dist
 
 echo
