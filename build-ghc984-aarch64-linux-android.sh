@@ -18,24 +18,6 @@ export STRIP=aarch64-linux-android-strip
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
-if [ ! -d libiconv-1.17 ]; then
-    curl -O https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-    tar -xzf libiconv-1.17.tar.gz
-fi
-cd libiconv-1.17
-./configure --host=$TARGET --prefix=$ANDROID_TOOLCHAIN --disable-shared --enable-static
-make -j$(nproc) install
-cd ..
-
-if [ ! -d libffi-3.4.4 ]; then
-    curl -L -O https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz
-    tar -xzf libffi-3.4.4.tar.gz
-fi
-cd libffi-3.4.4
-./configure --host=$TARGET --prefix=$ANDROID_TOOLCHAIN --disable-shared --enable-static
-make -j$(nproc) install
-cd ..
-
 if [ ! -d ghc ]; then
   git clone --branch ghc-${GHC_VERSION}-release \
     --depth 1 https://gitlab.haskell.org/ghc/ghc.git
