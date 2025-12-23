@@ -55,14 +55,6 @@ RUN ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py \
       --api ${ANDROID_API} \
       --install-dir /opt/android-toolchain
 
-ENV PATH=/opt/android-toolchain/bin:${PATH}
-ENV CC=aarch64-linux-android-clang
-ENV CXX=aarch64-linux-android-clang++
-ENV LD=aarch64-linux-android-ld
-ENV AR=aarch64-linux-android-ar
-ENV RANLIB=aarch64-linux-android-ranlib
-ENV STRIP=aarch64-linux-android-strip
-
 ENV BOOTSTRAP_GHC=9.6.6
 ENV GHC_PREFIX=/opt/ghc-${BOOTSTRAP_GHC}
 
