@@ -43,11 +43,6 @@ git submodule update --init --recursive
     --with-iconv-libraries="$ANDROID_TOOLCHAIN/lib" \
     --with-system-libffi-includes="$ANDROID_TOOLCHAIN/include" \
     --with-system-libffi-libraries="$ANDROID_TOOLCHAIN/lib" \
-    --configure-option="--with-cc=$CC" \
-    --configure-option="--with-cxx=$CXX" \
-    --configure-option="--with-ld=$LD" \
-    --configure-option="--with-ar=$AR" \
-    --configure-option="--with-ranlib=$RANLIB"
 
 hadrian/build \
   --build-root=_build \
