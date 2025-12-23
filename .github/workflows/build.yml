@@ -4,88 +4,23 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TARGET: aarch64-linux-android
-      API_LEVEL: 35
-      PREFIX: ${{ github.workspace }}/android-bridge
-      GHCUP_INSTALL_BASE_PREFIX: /home/runner
+
     steps:
-      - name: Maximize Disk Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: false
+      - uses: actions/checkout@v4
 
-      - name: Checkout GHC
-        uses: actions/checkout@v4
-        with:
-          repository: 'ghc/ghc'
-          ref: 'ghc-9.8.4-release'
-          submodules: 'recursive'
+      - name: Build Docker image
+        run: docker build -t ghc-android .
 
-      - name: Prepare GHCup
+      - name: Run build
         run: |
-          mkdir -p $HOME/.ghcup/{bin,ghc,logs,cache,downloads}
-          ls -la $HOME/.ghcup || true
+          docker run --rm \
+            -v $PWD:/workspace \
+            -w /workspace \
+            ghc-android \
+            bash /workspace/build-ghc984-aarch64-linux-android.sh
 
-      - name: Setup Haskell
-        uses: haskell-actions/setup@v2
-        with:
-          ghc-version: '9.8.4'
-          cabal-version: '3.10.3.0'
-
-      - name: Install System Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential automake autoconf libtool gperf python3 llvm-15 clang
-
-      - name: Setup NDK Path
-        run: |
-          echo "TOOLCHAIN=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64" >> $GITHUB_ENV
-          echo "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-
-      - name: Build libiconv
-        run: |
-          mkdir -p $PREFIX
-          curl -LO https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-          tar -xzf libiconv-1.17.tar.gz
-          cd libiconv-1.17
-          ./configure --host=$TARGET --prefix=$PREFIX --disable-shared --enable-static \
-            CC=$TARGET$API_LEVEL-clang
-          make -j$(nproc) && make install
-
-      - name: Build ncurses
-        run: |
-          curl -LO https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
-          tar -xzf ncurses-6.4.tar.gz
-          cd ncurses-6.4
-          ./configure --host=$TARGET --prefix=$PREFIX --with-shared=no --without-debug \
-            --without-ada --without-cxx-binding --enable-widec \
-            CC=$TARGET$API_LEVEL-clang
-          make -j$(nproc) && make install
-
-      - name: Build GHC
-        run: |
-          ./boot
-          ./configure \
-            --target=$TARGET \
-            --with-intree-gmp \
-            --with-system-libffi=no \
-            --with-iconv-includes=$PREFIX/include \
-            --with-iconv-libraries=$PREFIX/lib \
-            --with-curses-includes=$PREFIX/include \
-            --with-curses-libraries=$PREFIX/lib \
-            CONF_CC_OPTS_STAGE2="-I$PREFIX/include" \
-            CONF_GCC_LINKER_OPTS_STAGE2="-L$PREFIX/lib" \
-            --with-clang=$TOOLCHAIN/bin/clang \
-            --with-ar=$TOOLCHAIN/bin/llvm-ar \
-            --with-nm=$TOOLCHAIN/bin/llvm-nm \
-            --with-ranlib=$TOOLCHAIN/bin/llvm-ranlib
-
-          hadrian/build -j$(nproc) --flavour=quick-cross binary-dist
-
-      - name: Upload Finished GHC
+      - name: Upload bindist
         uses: actions/upload-artifact@v4
         with:
           name: ghc-9.8.4-android-aarch64
-          path: _build/bindist/*.tar.xz
+          path: ghc/_build/bindist/*.tar.xz
