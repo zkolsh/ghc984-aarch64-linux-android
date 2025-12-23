@@ -48,8 +48,6 @@ git submodule update --init --recursive
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
-  "*.capstone.configure=--host=$TARGET" \
-  "stage1.*.ghc.link.opts=-optl-static" \
   binary-dist
 
 echo
