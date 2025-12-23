@@ -36,19 +36,22 @@ git clone --recursive -b ghc-9.8.4-release https://github.com/ghc/ghc.git ghc
 cd ghc
 
 ./boot
+CC=aarch64-linux-android21-clang \
+CXX=aarch64-linux-android21-clang++ \
+AR=llvm-ar \
+NM=llvm-nm \
+RANLIB=llvm-ranlib \
+OBJDUMP=llvm-objdump \
+STRIP=llvm-strip \
 ./configure \
-  --target=$TARGET \
+  --target=aarch64-linux-android \
   --with-intree-gmp \
   --with-system-libffi=no \
-  --with-iconv-includes=$PREFIX/include \
-  --with-iconv-libraries=$PREFIX/lib \
-  --with-curses-includes=$PREFIX/include \
-  --with-curses-libraries=$PREFIX/lib \
-  --with-clang=$(which clang) \
-  --with-ar=llvm-ar \
-  --with-nm=llvm-nm \
-  --with-ranlib=llvm-ranlib \
-  CONF_CC_OPTS_STAGE2="-I$PREFIX/include" \
-  CONF_GCC_LINKER_OPTS_STAGE2="-L$PREFIX/lib"
+  --with-iconv-includes=/opt/android-bridge/include \
+  --with-iconv-libraries=/opt/android-bridge/lib \
+  --with-curses-includes=/opt/android-bridge/include \
+  --with-curses-libraries=/opt/android-bridge/lib \
+  CONF_CC_OPTS_STAGE2="-I/opt/android-bridge/include" \
+  CONF_GCC_LINKER_OPTS_STAGE2="-L/opt/android-bridge/lib"
 
 hadrian/build -j$(nproc) --flavour=quick-cross binary-dist
