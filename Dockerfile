@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl git python3 gperf \
     llvm-15 clang \
     xz-utils ca-certificates \
-    happy alex \
+    cabal-install \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /ndk && \
@@ -31,5 +31,10 @@ RUN mkdir -p /opt/ghc-src && \
     make install
 
 ENV PATH=/opt/ghc/bin:$PATH
+
+RUN cabal update && \
+    cabal install happy alex \
+      --install-method=copy \
+      --installdir=/usr/local/bin
 
 WORKDIR /build
