@@ -36,8 +36,8 @@ RUN mkdir -p /opt/ghc-src && \
 ENV PATH=/opt/ghc/bin:$PATH
 
 RUN cabal update && \
-    cabal install happy-1.20.1 --installdir=/usr/local/bin --overwrite-policy=always
+    cabal install happy-1.20.1.1 --installdir=/usr/local/bin --overwrite-policy=always
 
-RUN cabal install alex-3.2.7 --installdir=/usr/local/bin --overwrite-policy=always
+RUN cabal install alex-3.2.7.1 --installdir=/usr/local/bin --overwrite-policy=always
 
 WORKDIR /build
