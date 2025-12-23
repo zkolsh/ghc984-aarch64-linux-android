@@ -27,7 +27,11 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     ghc \
     cabal-install \
+    openjdk-17-jdk \
     && rm -rf /var/lib/apt/lists/*
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=${JAVA_HOME}/bin:${PATH}
 
 RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
     curl -L https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip \
