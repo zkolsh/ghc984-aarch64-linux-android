@@ -33,7 +33,6 @@ git submodule update --init --recursive
     --with-intree-gmp \
     --with-system-libffi \
     --enable-unregisterised \
-    --with-gcc="$CC" \
     CC="$CC" \
     CXX="$CXX" \
     LD="$LD" \
