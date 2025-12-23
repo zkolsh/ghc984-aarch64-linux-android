@@ -12,6 +12,7 @@ export CC=aarch64-linux-android21-clang
 export CXX=aarch64-linux-android21-clang++
 export LD=$CC
 export AR=llvm-ar
+export NM=$(which llvm-nm)
 export RANLIB=llvm-ranlib
 export STRIP=aarch64-linux-android-strip
 
@@ -32,6 +33,7 @@ git submodule update --init --recursive
     --with-intree-gmp \
     --with-system-libffi \
     --enable-unregisterised \
+    --with-gcc="$CC" \
     CC="$CC" \
     CXX="$CXX" \
     LD="$LD" \
@@ -47,6 +49,9 @@ git submodule update --init --recursive
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
+  "*.capstone.configure=--host=$TARGET" \
+  "*.gmp.configure=--host=$TARGET" \
+  "stage1.*.ghc.link.opts=-optl-static" \
   binary-dist
 
 echo
