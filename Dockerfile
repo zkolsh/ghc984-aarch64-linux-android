@@ -23,8 +23,8 @@ ENV ANDROID_NDK_HOME=/android-ndk
 ENV PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
 
 RUN curl -L https://downloads.haskell.org/ghc/9.8.4/ghc-9.8.4-x86_64-deb11-linux.tar.xz \
-    | tar -xJ && \
-    cd ghc-9.8.4 && \
+    | tar -xJ -C /opt/ghc-src --strip-components=1 && \
+    cd /opt/ghc-src && \
     ./configure --prefix=/opt/ghc && \
     make install
 
