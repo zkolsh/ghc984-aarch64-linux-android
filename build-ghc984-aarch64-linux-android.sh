@@ -50,8 +50,6 @@ hadrian/build \
   --flavour=quick-cross \
   "*.capstone.configure=--host=$TARGET" \
   "stage1.*.ghc.link.opts=-optl-static" \
-  "stage1.apache-httpd.-terminfo" \
-  "stage1.hsc2hs.-terminfo" \
   binary-dist
 
 echo
