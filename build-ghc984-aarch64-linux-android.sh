@@ -5,6 +5,8 @@ GHC_VERSION=9.8.4
 TARGET=aarch64-unknown-linux-android
 ANDROID_API=21
 
+export ANDROID_NDK_ROOT=/opt/android-ndk
+export ANDROID_TOOLCHAIN=/opt/android-toolchain
 export PATH=/opt/android-toolchain/bin:${PATH}
 export CC=aarch64-linux-android21-clang
 export CXX=aarch64-linux-android21-clang++
@@ -41,9 +43,6 @@ fi
 
 cd ghc
 git submodule update --init --recursive
-
-export ANDROID_NDK_ROOT=/opt/android-ndk
-export ANDROID_TOOLCHAIN=/opt/android-toolchain
 
 ./boot
 ./configure \
