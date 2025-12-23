@@ -36,13 +36,13 @@ git clone --recursive -b ghc-9.8.4-release https://github.com/ghc/ghc.git ghc
 cd ghc
 
 ./boot
-CC=aarch64-linux-android21-clang \
-CXX=aarch64-linux-android21-clang++ \
-AR=llvm-ar \
-NM=llvm-nm \
-RANLIB=llvm-ranlib \
-OBJDUMP=llvm-objdump \
-STRIP=llvm-strip \
+export CC=aarch64-linux-android35-clang
+export CXX=aarch64-linux-android35-clang++
+export AS=aarch64-linux-android35-clang
+export LD=ld.lld
+export AR=llvm-ar
+export NM=llvm-nm
+export RANLIB=llvm-ranlib
 ./configure \
   --target=aarch64-linux-android \
   --with-intree-gmp \
