@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y \
     automake \
     libtool \
     pkg-config \
-    ghc \
     cabal-install \
     openjdk-17-jdk \
     && rm -rf /var/lib/apt/lists/*
@@ -63,6 +62,17 @@ ENV LD=aarch64-linux-android-ld
 ENV AR=aarch64-linux-android-ar
 ENV RANLIB=aarch64-linux-android-ranlib
 ENV STRIP=aarch64-linux-android-strip
+
+ENV BOOTSTRAP_GHC=9.6.6
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
+    BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
+    BOOTSTRAP_HASKELL_GHC_VERSION=${BOOTSTRAP_GHC} \
+    BOOTSTRAP_HASKELL_INSTALL_HLS=0 \
+    BOOTSTRAP_HASKELL_INSTALL_STACK=0 \
+    sh
+
+ENV PATH=/root/.ghcup/bin:${PATH}
 
 RUN cabal update
 
