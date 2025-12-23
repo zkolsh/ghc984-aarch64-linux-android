@@ -36,6 +36,8 @@ export ANDROID_TOOLCHAIN=/opt/android-toolchain
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
+  --target=aarch64-linux-android \
+  --cross-compile \
   binary-dist
 
 echo
