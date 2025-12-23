@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     curl git python3 gperf \
     llvm-15 clang \
     xz-utils ca-certificates \
+    happy alex \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /ndk && \
@@ -28,14 +29,6 @@ RUN mkdir -p /opt/ghc-src && \
     cd /opt/ghc-src && \
     ./configure --prefix=/opt/ghc && \
     make install
-
-RUN curl -fL https://downloads.haskell.org/~ghc/9.8.4/happy-1.20.1-x86_64-linux.tar.xz \
-    | tar -xJ && \
-    mv happy-*/happy /usr/local/bin/
-
-RUN curl -fL https://downloads.haskell.org/~ghc/9.8.4/alex-3.2.7-x86_64-linux.tar.xz \
-    | tar -xJ && \
-    mv alex-*/alex /usr/local/bin/
 
 ENV PATH=/opt/ghc/bin:$PATH
 
