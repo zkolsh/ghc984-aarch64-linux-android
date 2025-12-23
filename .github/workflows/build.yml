@@ -23,6 +23,11 @@ jobs:
           ref: 'ghc-9.8.4-release'
           submodules: 'recursive'
 
+      - name: Prepare GHCup
+        run: |
+          mkdir -p $HOME/.ghcup/{bin,ghc,logs,cache,downloads}
+          ls -la $HOME/.ghcup || true
+
       - name: Setup Haskell
         uses: haskell-actions/setup@v2
         with:
