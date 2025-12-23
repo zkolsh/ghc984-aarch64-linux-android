@@ -68,12 +68,12 @@ ENV GHC_PREFIX=/opt/ghc-${BOOTSTRAP_GHC}
 
 RUN curl -L https://downloads.haskell.org/~ghc/${BOOTSTRAP_GHC}/ghc-${BOOTSTRAP_GHC}-x86_64-deb10-linux.tar.xz \
     -o /tmp/ghc.tar.xz && \
-    mkdir -p /tmp/ghc && \
-    tar -xf /tmp/ghc.tar.xz -C /tmp/ghc && \
-    cd /tmp/ghc/ghc-${BOOTSTRAP_GHC}-x86_64-deb10-linux && \
+    mkdir -p /tmp/ghc-src && \
+    tar -xf /tmp/ghc.tar.xz -C /tmp/ghc-src --strip-components=1 && \
+    cd /tmp/ghc-src && \
     ./configure --prefix=${GHC_PREFIX} && \
     make install && \
-    rm -rf /tmp/ghc /tmp/ghc.tar.xz
+    rm -rf /tmp/ghc-src /tmp/ghc.tar.xz
 
 ENV PATH=${GHC_PREFIX}/bin:${PATH}
 
