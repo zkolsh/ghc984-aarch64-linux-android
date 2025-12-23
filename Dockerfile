@@ -64,15 +64,18 @@ ENV RANLIB=aarch64-linux-android-ranlib
 ENV STRIP=aarch64-linux-android-strip
 
 ENV BOOTSTRAP_GHC=9.6.6
+ENV GHC_PREFIX=/opt/ghc-${BOOTSTRAP_GHC}
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
-    BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
-    BOOTSTRAP_HASKELL_GHC_VERSION=${BOOTSTRAP_GHC} \
-    BOOTSTRAP_HASKELL_INSTALL_HLS=0 \
-    BOOTSTRAP_HASKELL_INSTALL_STACK=0 \
-    sh
+RUN curl -L https://downloads.haskell.org/~ghc/${BOOTSTRAP_GHC}/ghc-${BOOTSTRAP_GHC}-x86_64-deb10-linux.tar.xz \
+    -o /tmp/ghc.tar.xz && \
+    mkdir -p /tmp/ghc && \
+    tar -xf /tmp/ghc.tar.xz -C /tmp/ghc && \
+    cd /tmp/ghc/ghc-${BOOTSTRAP_GHC} && \
+    ./configure --prefix=${GHC_PREFIX} && \
+    make install && \
+    rm -rf /tmp/ghc /tmp/ghc.tar.xz
 
-ENV PATH=/root/.ghcup/bin:${PATH}
+ENV PATH=${GHC_PREFIX}/bin:${PATH}
 
 RUN cabal update
 
