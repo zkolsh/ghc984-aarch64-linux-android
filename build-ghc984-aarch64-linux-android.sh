@@ -17,10 +17,17 @@ cd ..
 curl -LO https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.4.tar.gz
 tar -xzf ncurses-6.4.tar.gz
 cd ncurses-6.4
-./configure --host=$TARGET --prefix=$PREFIX \
-  --with-shared=no --without-debug \
-  --without-ada --without-cxx-binding \
-  --enable-widec CC=$CC
+./configure \
+  --host=$TARGET \
+  --prefix=$PREFIX \
+  --with-shared=no \
+  --without-debug \
+  --without-ada \
+  --without-cxx-binding \
+  --enable-widec \
+  --disable-stripping \
+  --without-progs \
+  CC=$CC
 make -j$(nproc)
 make install
 cd ..
