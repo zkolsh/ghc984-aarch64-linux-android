@@ -29,12 +29,12 @@ RUN mkdir -p /opt/ghc-src && \
     ./configure --prefix=/opt/ghc && \
     make install
 
-RUN curl -L https://downloads.haskell.org/~ghc/9.8.4/happy-1.20.1-x86_64-linux.tar.gz \
-    | tar -xz && \
+RUN curl -fL https://downloads.haskell.org/~ghc/9.8.4/happy-1.20.1-x86_64-linux.tar.xz \
+    | tar -xJ && \
     mv happy-*/happy /usr/local/bin/
 
-RUN curl -L https://downloads.haskell.org/~ghc/9.8.4/alex-3.2.7-x86_64-linux.tar.gz \
-    | tar -xz && \
+RUN curl -fL https://downloads.haskell.org/~ghc/9.8.4/alex-3.2.7-x86_64-linux.tar.xz \
+    | tar -xJ && \
     mv alex-*/alex /usr/local/bin/
 
 ENV PATH=/opt/ghc/bin:$PATH
