@@ -28,7 +28,7 @@ ghcup compile ghc \
   -v ${GHC_VERSION} \
   -b ${BOOTSTRAP_GHC} \
   -x ${TARGET} \
-  --prefix ${PREFIX} \
+  --isolate ${PREFIX} \
   --hadrian \
   --flavour=quick-cross \
   -- \
