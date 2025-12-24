@@ -33,6 +33,7 @@ ghcup compile ghc \
   --flavour=quick-cross \
   -- \
   --with-system-libffi \
+  --with-ghc-bignum-backend=native \
   --enable-shared \
   --disable-static
 
