@@ -11,6 +11,7 @@ TARBALL=/workspace/ghc-${GHC_VERSION}-linux-android-aarch64.tar.xz
 export ANDROID_NDK_ROOT=/opt/android-ndk
 export ANDROID_TOOLCHAIN=/opt/android-toolchain
 export PATH=/opt/android-toolchain/bin:${PATH}
+
 export CC=aarch64-linux-android${ANDROID_API}-clang
 export CXX=aarch64-linux-android${ANDROID_API}-clang++
 export LD=ld.ldd
@@ -18,6 +19,13 @@ export AR=llvm-ar
 export NM=$(which llvm-nm)
 export RANLIB=llvm-ranlib
 export STRIP=aarch64-linux-android-strip
+
+export CC_FOR_BUILD=gcc
+export CXX_FOR_BUILD=g++
+export LD_FOR_BUILD=ld
+export AR_FOR_BUILD=ar
+export RANLIB_FOR_BUILD=ranlib
+
 export LLVM_CONFIG=llvm-config
 export LLC=clang
 export OPT=clang
