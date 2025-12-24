@@ -33,8 +33,9 @@ git submodule update --init --recursive
     --build=x86_64-unknown-linux-gnu \
     --host=x86_64-unknown-linux-gnu \
     --with-ghc-bignum-backend=native \
-    --with-system-libffi \
+    --with-system-libffi=no \
     --enable-unregisterised \
+    --with-gcc="$CC" \
     CC="$CC" \
     CXX="$CXX" \
     LD="$LD" \
