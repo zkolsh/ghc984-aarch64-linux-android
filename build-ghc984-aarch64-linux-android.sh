@@ -30,6 +30,8 @@ git submodule update --init --recursive
 ./boot
 ./configure \
     --target=$TARGET \
+    --build=x86_64-unknown-linux-gnu \
+    --host=x86_64-unknown-linux-gnu \
     --with-ghc-bignum-backend=native \
     --with-system-libffi \
     --enable-unregisterised \
@@ -48,6 +50,8 @@ git submodule update --init --recursive
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
+  "stage1.rts.ghc.c.opts = -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1 -Darch_HOST_ARCH=0 -Darch_TARGET_ARCH=1" \
+  "stage1.rts.ghc.hs.opts = -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1" \
   binary-dist
 
 echo
