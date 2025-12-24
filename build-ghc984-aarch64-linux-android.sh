@@ -2,7 +2,7 @@
 set -euo pipefail
 
 GHC_VERSION=9.8.4
-TARGET=aarch64-unknown-linux-android
+TARGET=aarch64-unknown-linux
 ANDROID_API=21
 
 export ANDROID_NDK_ROOT=/opt/android-ndk
