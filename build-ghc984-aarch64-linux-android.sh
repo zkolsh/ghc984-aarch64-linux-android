@@ -34,7 +34,8 @@ ghcup compile ghc \
   -- \
   --with-system-libffi=no \
   --with-ghc-bignum-backend=native \
-  --enable-shared
+  --enable-shared \
+  --verbose
 
 tar -C ${PREFIX} -cJf ${TARBALL} .
 
