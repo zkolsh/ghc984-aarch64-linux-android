@@ -50,9 +50,9 @@ git submodule update --init --recursive
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
-  "stage1.ghc.c.opts += -pgmc aarch64-linux-android21-clang" \
-  "stage1.rts.ghc.c.opts += -pgmc aarch64-linux-android21-clang" \
-  "stage1.rts.ghc.hs.opts += -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1" \
+  "*.ghc.c.opts += -pgmc aarch64-linux-android21-clang" \
+  "*.rts.c.opts += -pgmc aarch64-linux-android21-clang" \
+  "stage1.*.ghc.hs.opts += -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1" \
   binary-dist
 
 echo
