@@ -23,4 +23,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ghc-9.8.4-android-aarch64
-          path: ghc/_build/bindist/*.tar.xz
+          path: ghc-9.8.4-android-aarch64.tar.xz
+          if-no-files-found: error
+          retention-days: 1

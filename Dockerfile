@@ -27,6 +27,9 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     cabal-install \
     openjdk-17-jdk \
+    llvm \
+    llvm-dev \
+    clang \
     && rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
@@ -69,12 +72,11 @@ RUN curl -L https://downloads.haskell.org/~ghc/${BOOTSTRAP_GHC}/ghc-${BOOTSTRAP_
 
 ENV PATH=${GHC_PREFIX}/bin:${PATH}
 
-RUN cabal update
-
-RUN cabal install \
-      alex-3.2.7.1 \
-      happy-1.20.1.1 \
-      --installdir=/usr/local/bin \
-      --overwrite-policy=always
+ENV GHCUP_INSTALL_BASE_PREFIX=/opt
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
+    BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
+    BOOTSTRAP_HASKELL_GHC_VERSION=none \
+    BOOTSTRAP_HASKELL_CABAL_VERSION=none \
+    sh
 
 WORKDIR /workspace
