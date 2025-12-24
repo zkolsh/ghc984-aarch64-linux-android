@@ -8,17 +8,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: ghc-android
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: docker build -t ghc-android .
 
       - name: Run build
         run: |
