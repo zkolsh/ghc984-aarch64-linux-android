@@ -12,8 +12,6 @@ export ANDROID_NDK_ROOT=/opt/android-ndk
 export ANDROID_TOOLCHAIN=/opt/android-toolchain
 export PATH=/opt/android-toolchain/bin:${PATH}
 
-export CC=aarch64-linux-android${ANDROID_API}-clang
-export CXX=aarch64-linux-android${ANDROID_API}-clang++
 export LD=ld.ldd
 export AR=llvm-ar
 export NM=$(which llvm-nm)
@@ -52,7 +50,6 @@ ghcup compile ghc \
   --hadrian \
   --flavour=quick-cross+native_bignum \
   -- \
-  --hadrian-args="--disable-ghci --disable-interpreter" \
   --verbose
 
 rc=$?
