@@ -13,11 +13,14 @@ export ANDROID_TOOLCHAIN=/opt/android-toolchain
 export PATH=/opt/android-toolchain/bin:${PATH}
 export CC=aarch64-linux-android${ANDROID_API}-clang
 export CXX=aarch64-linux-android${ANDROID_API}-clang++
-export LD=$CC
+export LD=ld.ldd
 export AR=llvm-ar
 export NM=$(which llvm-nm)
 export RANLIB=llvm-ranlib
 export STRIP=aarch64-linux-android-strip
+export LLVM_CONFIG=llvm-config
+export LLC=clang
+export OPT=clang
 
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
@@ -26,6 +29,8 @@ export LDFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 
 export ac_cv_func_setenv=yes
 export ac_cv_func_putenv=yes
+export ac_cv_func_unsetenv=yes
+export ac_cv_lib_ffi_ffi_call=no
 
 export GHCUP_TMPDIR=/opt/.ghcup/logs/
 mkdir -p "${GHCUP_TMPDIR}"
@@ -39,9 +44,7 @@ ghcup compile ghc \
   --hadrian \
   --flavour=quick-cross \
   -- \
-  --with-system-libffi=no \
-  --with-ghc-bignum-backend=native \
-  --enable-shared \
+  --bignum=native \
   --verbose
 
 rc=$?
