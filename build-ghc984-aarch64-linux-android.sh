@@ -3,7 +3,7 @@ set -euo pipefail
 
 GHC_VERSION=9.8.4
 BOOTSTRAP_GHC=9.6.6
-TARGET=aarch64-unknown-android
+TARGET=aarch64-linux-android
 ANDROID_API=21
 PREFIX=/opt/ghc-${GHC_VERSION}-linux-android
 TARBALL=/workspace/ghc-${GHC_VERSION}-linux-android-aarch64.tar.xz
