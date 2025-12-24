@@ -42,9 +42,8 @@ ghcup compile ghc \
   -x "${TARGET}" \
   --isolate "${PREFIX}" \
   --hadrian \
-  --flavour=quick-cross \
+  --flavour=quick-cross+native_bignum \
   -- \
-  --bignum=native \
   --verbose
 
 rc=$?
