@@ -24,7 +24,7 @@ export LANG=C.UTF-8
 export CFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 export LDFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 
-export GHCUP_TMPDIR=/opt/.ghcup/tmp/
+export GHCUP_TMPDIR=/opt/.ghcup/logs/
 mkdir -p "${GHCUP_TMPDIR}"
 
 set +e
