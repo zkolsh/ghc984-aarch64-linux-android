@@ -24,6 +24,9 @@ export LANG=C.UTF-8
 export CFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 export LDFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 
+export ac_cv_func_setenv=yes
+export ac_cv_func_putenv=yes
+
 export GHCUP_TMPDIR=/opt/.ghcup/logs/
 mkdir -p "${GHCUP_TMPDIR}"
 
