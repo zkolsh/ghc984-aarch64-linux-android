@@ -52,6 +52,7 @@ ghcup compile ghc \
   --hadrian \
   --flavour=quick-cross+native_bignum \
   -- \
+  --hadrian-args="--disable-ghci --disable-interpreter" \
   --verbose
 
 rc=$?
