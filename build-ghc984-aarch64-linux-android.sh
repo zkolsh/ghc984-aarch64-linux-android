@@ -32,10 +32,9 @@ ghcup compile ghc \
   --hadrian \
   --flavour=quick-cross \
   -- \
-  --with-system-libffi \
+  --with-system-libffi=no \
   --with-ghc-bignum-backend=native \
-  --enable-shared \
-  --disable-static
+  --enable-shared
 
 tar -C ${PREFIX} -cJf ${TARBALL} .
 
