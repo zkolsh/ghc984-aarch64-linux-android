@@ -26,8 +26,3 @@ jobs:
           path: ghc-9.8.4-android-aarch64.tar.xz
           if-no-files-found: error
           retention-days: 1
-
-      - name: Dump Hadrian logs on failure
-        if: failure()
-        run: |
-          find /opt/.ghcup/tmp -name hadrian.log -print -exec tail -n 400 {} \;

@@ -24,11 +24,15 @@ export LANG=C.UTF-8
 export CFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 export LDFLAGS="--sysroot=${ANDROID_TOOLCHAIN}/sysroot"
 
+export GHCUP_TMPDIR=/opt/.ghcup/tmp/
+mkdir -p "${GHCUP_TMPDIR}"
+
+set +e
 ghcup compile ghc \
-  -v ${GHC_VERSION} \
-  -b ${BOOTSTRAP_GHC} \
-  -x ${TARGET} \
-  --isolate ${PREFIX} \
+  -v "${GHC_VERSION}" \
+  -b "${BOOTSTRAP_GHC}" \
+  -x "${TARGET}" \
+  --isolate "${PREFIX}" \
   --hadrian \
   --flavour=quick-cross \
   -- \
@@ -36,6 +40,25 @@ ghcup compile ghc \
   --with-ghc-bignum-backend=native \
   --enable-shared \
   --verbose
+
+rc=$?
+set -e
+
+if [ $rc -ne 0 ]; then
+  echo ">>> Build failed"
+  echo "Hadrian logs:"
+  find "${GHCUP_TMPDIR}" -name hadrian.log -print -exec tail -n 400 {} \; || true
+
+  echo
+  echo "*.log:"
+  find "${GHCUP_TMPDIR}" -name "*.log" -print -exec tail -n 400 {} \; || true
+
+  echo
+  echo "Directory tree:"
+  find "${GHCUP_TMPDIR}" -maxdepth 4 -type d || true
+
+  exit $rc
+fi
 
 tar -C ${PREFIX} -cJf ${TARBALL} .
 
