@@ -35,7 +35,6 @@ git submodule update --init --recursive
     --with-ghc-bignum-backend=native \
     --with-system-libffi=no \
     --enable-unregisterised \
-    --with-gcc="$CC" \
     CC="$CC" \
     CXX="$CXX" \
     LD="$LD" \
@@ -46,13 +45,14 @@ git submodule update --init --recursive
     --with-iconv-includes="$ANDROID_TOOLCHAIN/include" \
     --with-iconv-libraries="$ANDROID_TOOLCHAIN/lib" \
     --with-system-libffi-includes="$ANDROID_TOOLCHAIN/include" \
-    --with-system-libffi-libraries="$ANDROID_TOOLCHAIN/lib" \
+    --with-system-libffi-libraries="$ANDROID_TOOLCHAIN/lib"
 
 hadrian/build \
   --build-root=_build \
   --flavour=quick-cross \
-  "stage1.rts.ghc.c.opts = -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1 -Darch_HOST_ARCH=0 -Darch_TARGET_ARCH=1" \
-  "stage1.rts.ghc.hs.opts = -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1" \
+  "stage1.ghc.c.opts += -pgmc aarch64-linux-android21-clang" \
+  "stage1.rts.ghc.c.opts += -pgmc aarch64-linux-android21-clang" \
+  "stage1.rts.ghc.hs.opts += -Dtarget_arch_ADR_arch=1 -Dtarget_os_ADR_os=1" \
   binary-dist
 
 echo
