@@ -25,7 +25,6 @@ RUN apt-get update && apt-get install -y \
     automake \
     libtool \
     pkg-config \
-    cabal-install \
     openjdk-17-jdk \
     llvm \
     llvm-dev \
@@ -58,25 +57,13 @@ RUN ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py \
       --api ${ANDROID_API} \
       --install-dir /opt/android-toolchain
 
-ENV BOOTSTRAP_GHC=9.6.6
-ENV GHC_PREFIX=/opt/ghc-${BOOTSTRAP_GHC}
-
-RUN curl -L https://downloads.haskell.org/~ghc/${BOOTSTRAP_GHC}/ghc-${BOOTSTRAP_GHC}-x86_64-deb10-linux.tar.xz \
-    -o /tmp/ghc.tar.xz && \
-    mkdir -p /tmp/ghc-src && \
-    tar -xf /tmp/ghc.tar.xz -C /tmp/ghc-src --strip-components=1 && \
-    cd /tmp/ghc-src && \
-    ./configure --prefix=${GHC_PREFIX} && \
-    make install && \
-    rm -rf /tmp/ghc-src /tmp/ghc.tar.xz
-
-ENV PATH=${GHC_PREFIX}/bin:${PATH}
-
 ENV GHCUP_INSTALL_BASE_PREFIX=/opt
 RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
     BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
-    BOOTSTRAP_HASKELL_GHC_VERSION=none \
-    BOOTSTRAP_HASKELL_CABAL_VERSION=none \
+    BOOTSTRAP_HASKELL_GHC_VERSION=9.6.6 \
+    BOOTSTRAP_HASKELL_CABAL_VERSION=latest \
     sh
+
+ENV PATH=/opt/.ghcup/bin:${PATH}
 
 WORKDIR /workspace
